@@ -50,11 +50,9 @@ struct ContentView: View {
 
 struct BalconySceneView: View {
     @State private var showPlantingMode = false
-    @State private var showTomatoMenu = false
-    @State private var showPlantingView = false
 
     private var backgroundImageName: String {
-        showPlantingMode ? "阳台近景" : "阳台远景"
+        showPlantingMode ? "半枯萎状态" : "阳台远景"
     }
 
     var body: some View {
@@ -71,7 +69,6 @@ struct BalconySceneView: View {
                         Button {
                             withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
                                 showPlantingMode.toggle()
-                                showTomatoMenu = false
                             }
                         } label: {
                             Label(showPlantingMode ? "远景模式" : "近景模式", systemImage: "arrow.triangle.2.circlepath")
@@ -90,95 +87,44 @@ struct BalconySceneView: View {
                     }
 
                     Spacer()
-
-                    HStack {
-                        Spacer()
-
-                        Button {
-                            showPlantingView = true
-                        } label: {
-                            TomatoButtonShape()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color.red.opacity(0.95), Color.red.opacity(0.72), Color.orange.opacity(0.85)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .overlay(TomatoButtonShape().stroke(.white.opacity(0.25), lineWidth: 1.5))
-                                .overlay(
-                                    Image(systemName: "leaf.fill")
-                                        .font(.system(size: 14, weight: .bold))
-                                        .foregroundStyle(.green.opacity(0.9))
-                                        .offset(y: -6)
-                                )
-                                .frame(width: 64, height: 64)
-                                .shadow(color: .black.opacity(0.22), radius: 10, x: 0, y: 6)
-                        }
-                        .padding(.trailing, max(22, size.width * 0.10))
-                        .padding(.bottom, max(28, size.height * 0.08))
-                    }
                 }
                 .padding(.bottom, 2)
 
-                if showTomatoMenu {
-                    Color.black.opacity(0.14)
-                        .ignoresSafeArea()
-                        .onTapGesture { showTomatoMenu = false }
-
-                    VStack {
-                        Spacer()
-
-                        HStack {
-                            Spacer()
-
-                            VStack(spacing: 10) {
-                                MenuActionButton(title: "食用", systemImage: "fork.knife") {
-                                    showTomatoMenu = false
-                                }
-                                MenuActionButton(title: "分享", systemImage: "square.and.arrow.up") {
-                                    showTomatoMenu = false
-                                }
-                            }
-                            .padding(12)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .stroke(.white.opacity(0.18), lineWidth: 1)
-                            )
-                            .padding(.trailing, max(18, size.width * 0.07))
-                            .padding(.bottom, max(96, size.height * 0.18))
-                        }
-                    }
-                }
-
                 if showPlantingMode {
-                    VStack {
-                        Spacer()
+                    HStack(spacing: 0) {
+                        Spacer(minLength: 0)
 
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                            .fill(.thinMaterial)
-                            .overlay(alignment: .leading) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("已切换到近景 / 种植模式")
-                                        .font(.headline)
-                                    Text("这里可以进入更细的浇水、施肥、收获和交互操作界面。")
-                                        .font(.footnote)
-                                        .foregroundStyle(.secondary)
-                                }
-                                .padding(18)
+                        VStack(spacing: 0) {
+                            Spacer(minLength: 0)
+
+                            Text("")
+                                .frame(width: 1, height: 1)
+                                .hidden()
+                        }
+                        .frame(width: max(1, size.width * 0.72), height: size.height)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("辅助工具栏")
+                                .font(.headline)
+                                .foregroundStyle(.primary.opacity(0.8))
+
+                            VStack(spacing: 12) {
+                                ToolButton(title: "🐛 除虫") { }
+                                ToolButton(title: "💧 浇水") { }
+                                ToolButton(title: "✂️ 修剪枝叶") { }
                             }
-                            .frame(width: min(size.width * 0.62, 420), height: 110)
-                            .padding(.bottom, 24)
+
+                            Spacer()
+                        }
+                        .padding(16)
+                        .frame(width: max(210, size.width * 0.28), height: size.height)
+                        .background(.white.opacity(0.22), in: Rectangle())
                     }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .ignoresSafeArea()
+                    .transition(.opacity)
                 }
             }
             .animation(.spring(response: 0.28, dampingFraction: 0.84), value: showPlantingMode)
-            .animation(.spring(response: 0.28, dampingFraction: 0.84), value: showTomatoMenu)
-            .fullScreenCover(isPresented: $showPlantingView) {
-                PlantingView()
-            }
         }
     }
 
@@ -216,28 +162,17 @@ struct BalconySceneView: View {
     }
 }
 
-struct TomatoButtonShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radiusX = rect.width * 0.42
-        let radiusY = rect.height * 0.37
-        path.addEllipse(in: CGRect(x: center.x - radiusX, y: center.y - radiusY, width: radiusX * 2, height: radiusY * 2))
-        return path
-    }
-}
-
-struct MenuActionButton: View {
+struct ToolButton: View {
     let title: String
-    let systemImage: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Label(title, systemImage: systemImage)
+            Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
-                .frame(width: 116, height: 42)
+                .frame(maxWidth: .infinity)
+                .frame(height: 42)
                 .background(Color.white.opacity(0.92), in: Capsule())
         }
         .buttonStyle(.plain)

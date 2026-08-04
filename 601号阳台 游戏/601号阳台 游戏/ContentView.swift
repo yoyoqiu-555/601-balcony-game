@@ -51,6 +51,7 @@ struct ContentView: View {
 struct BalconySceneView: View {
     @State private var showPlantingMode = false
     @State private var showTomatoMenu = false
+    @State private var showPlantingView = false
 
     private var backgroundImageName: String {
         showPlantingMode ? "阳台近景" : "阳台远景"
@@ -94,7 +95,7 @@ struct BalconySceneView: View {
                         Spacer()
 
                         Button {
-                            showTomatoMenu.toggle()
+                            showPlantingView = true
                         } label: {
                             TomatoButtonShape()
                                 .fill(
@@ -175,6 +176,9 @@ struct BalconySceneView: View {
             }
             .animation(.spring(response: 0.28, dampingFraction: 0.84), value: showPlantingMode)
             .animation(.spring(response: 0.28, dampingFraction: 0.84), value: showTomatoMenu)
+            .fullScreenCover(isPresented: $showPlantingView) {
+                PlantingView()
+            }
         }
     }
 

@@ -59,7 +59,7 @@ final class OpeningSceneManager: ObservableObject {
         let duration: Double = switch scene {
         case .city: 6.0
         case .building: 4.0
-        case .elevatorTransition: 3.0
+        case .elevatorTransition: 4.0
         case .room: 6.0
         case .deliveryWindow: 7.0
         case .choice: 5.0
@@ -93,10 +93,6 @@ final class OpeningSceneManager: ObservableObject {
             if Task.isCancelled { return }
 
             if item.0 == .choice {
-                choiceTask?.cancel()
-                choiceTask = Task {
-                    await finishFlowIfNeeded(after: 0.6)
-                }
                 break
             }
 
@@ -237,8 +233,9 @@ struct OpeningCityScene: View {
             Image("BalconyCity")
                 .resizable()
                 .scaledToFill()
-                .scaleEffect(1.05 + progress * 0.10)
-                .offset(y: -progress * 18)
+                .frame(width: UIScreen.main.bounds.width * 1.2, height: UIScreen.main.bounds.height)
+                .scaleEffect(1.04 + progress * 0.08)
+                .offset(y: -progress * 10)
                 .overlay(
                     Rectangle()
                         .fill(
@@ -289,32 +286,6 @@ struct OpeningCityScene: View {
             }
 
             ScanBeamOverlay(progress: progress)
-
-            VStack(alignment: .leading, spacing: 14) {
-                Spacer()
-                OpeningTextBlock(
-                    lines: [
-                        "2157年。",
-                        "人类建立了高度自动化的城市系统。",
-                        "AI接管环境、资源与生活管理。",
-                        "每个人的生活，都被安排在最优路径上。"
-                    ],
-                    alignment: .leading,
-                    maxWidth: 560
-                )
-                .padding(.leading, 20)
-                .padding(.bottom, 18)
-            }
-        }
-        .overlay(alignment: .topLeading) {
-            VStack(alignment: .leading, spacing: 8) {
-                AISystemMessage(text: "SYS / CITY VIEW ONLINE")
-                AISystemMessage(text: "ENVIRONMENTAL CONTROL: STABLE")
-            }
-            .padding(.leading, 14)
-            .padding(.top, 14)
-            .opacity(progress > 0.15 ? 1 : 0)
-            .animation(.easeInOut(duration: 0.4), value: progress)
         }
     }
 }
@@ -353,7 +324,8 @@ struct OpeningBuildingScene: View {
             Image("BalconyCity")
                 .resizable()
                 .scaledToFill()
-                .scaleEffect(1.2)
+                .frame(width: UIScreen.main.bounds.width * 1.2, height: UIScreen.main.bounds.height)
+                .scaleEffect(1.1 + progress * 0.05)
                 .blur(radius: 1.0)
                 .opacity(0.9)
                 .ignoresSafeArea()
@@ -403,25 +375,6 @@ struct OpeningBuildingScene: View {
                     .transition(.opacity)
             }
 
-            VStack(alignment: .leading, spacing: 10) {
-                Spacer()
-                AISystemMessage(text: "居民身份确认。")
-                AISystemMessage(text: "环境状态：正常。")
-                AISystemMessage(text: "今日生活计划已自动优化。")
-            }
-            .padding(.leading, 18)
-            .padding(.bottom, 20)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-        }
-        .overlay(alignment: .topTrailing) {
-            OpeningTextBlock(
-                lines: ["目标住所锁定。", "请跟随系统导航进入内部空间。"],
-                alignment: .trailing,
-                maxWidth: 320
-            )
-            .padding(.top, 18)
-            .padding(.trailing, 18)
-            .opacity(progress > 0.22 ? 1 : 0)
         }
     }
 }
@@ -625,13 +578,6 @@ struct OpeningRoomScene: View {
                     .position(x: 160, y: 180)
             }
 
-            VStack(alignment: .leading, spacing: 10) {
-                Spacer()
-                AISystemMessage(text: "检测到今日营养补给已送达。")
-            }
-            .padding(.leading, 18)
-            .padding(.bottom, 18)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
@@ -798,7 +744,6 @@ struct OpeningChoiceScene: View {
 
                 choiceButtons
                     .padding(.top, 2)
-                    .opacity(selection == nil ? 1 : 0.65)
 
                 if let selection {
                     selectionText(selection)

@@ -116,7 +116,7 @@ struct PlantingView: View {
             Image(currentImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: size.width * 0.54, maxHeight: size.height * 0.72)
+                .frame(maxWidth: size.width * 0.44, maxHeight: size.height * 0.60)
                 .scaleEffect(plantState == .recovering ? 0.92 : 1)
                 .opacity(plantState == .recovering ? 0.72 : 1)
                 .animation(.spring(response: 0.5, dampingFraction: 0.75), value: plantState == .recovering)
@@ -148,6 +148,7 @@ struct PlantingView: View {
             }
 
             tomatoShareButton
+                .frame(maxWidth: .infinity, alignment: .bottomTrailing)
                 .padding(.trailing, 16)
                 .padding(.bottom, 18)
                 .zIndex(2)

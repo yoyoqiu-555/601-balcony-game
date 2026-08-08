@@ -146,12 +146,6 @@ struct PlantingView: View {
                     .offset(x: 95 + bugOffset, y: -105)
                     .transition(.opacity)
             }
-
-            tomatoShareButton
-                .frame(maxWidth: .infinity, alignment: .bottomTrailing)
-                .padding(.trailing, 16)
-                .padding(.bottom, 18)
-                .zIndex(2)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -166,6 +160,7 @@ struct PlantingView: View {
             careButton("🐛", "除虫", completed: hasRemovedBug) { removeBug() }
             careButton("💧", "浇水", completed: hasWatered) { waterPlant() }
             careButton("✂️", "修剪枝叶", completed: hasTrimmed) { trimPlant() }
+            careButton("🍅", "分享收获", completed: false) { showHarvestShare = true }
 
             Spacer(minLength: 0)
 
@@ -187,25 +182,28 @@ struct PlantingView: View {
         Button {
             showHarvestShare = true
         } label: {
-            Text("🍅")
-                .font(.system(size: 24, weight: .bold))
-                .frame(width: 48, height: 48)
-                .foregroundStyle(.white)
-                .background(
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                )
-                .overlay(
-                    Circle()
-                        .stroke(.white.opacity(0.34), lineWidth: 1.2)
-                )
-                .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
+            HStack(spacing: 10) {
+                Text("🍅")
+                    .font(.title3)
+                Text("分享收获")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .frame(height: 44)
+            .background(
+                LinearGradient(
+                    colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: Capsule()
+            )
+            .overlay(
+                Capsule()
+                    .stroke(.white.opacity(0.34), lineWidth: 1.2)
+            )
+            .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("分享收获"))
@@ -215,7 +213,7 @@ struct PlantingView: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Text(icon).font(.title3)
-                Text(completed ? "\(title)完成" : title)
+                Text(title)
                     .font(.headline)
                 Spacer()
                 Image(systemName: completed ? "checkmark.circle.fill" : "chevron.right")

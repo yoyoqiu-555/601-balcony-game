@@ -16,6 +16,7 @@ struct PlantingView: View {
     @State private var showWaterDrops = false
     @State private var showScissors = false
     @State private var showCompletion = false
+    @State private var showHarvestShare = false
 
     private let witheredPlantImage = "半枯萎状态"
     private let healthyPlantImage = "阳台近景"
@@ -56,6 +57,9 @@ struct PlantingView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+            }
+            .sheet(isPresented: $showHarvestShare) {
+                HarvestShareView()
             }
             .ignoresSafeArea(size.width > size.height ? [] : [])
         }
@@ -142,6 +146,9 @@ struct PlantingView: View {
                     .offset(x: 95 + bugOffset, y: -105)
                     .transition(.opacity)
             }
+
+            tomatoShareButton
+                .offset(x: 112, y: 108)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -171,6 +178,37 @@ struct PlantingView: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(.white.opacity(0.34), lineWidth: 1)
         )
+    }
+
+    private var tomatoShareButton: some View {
+        Button {
+            showHarvestShare = true
+        } label: {
+            HStack(spacing: 8) {
+                Text("🍅")
+                    .font(.title3)
+                Text("分享收获")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(
+                LinearGradient(
+                    colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: Capsule()
+            )
+            .overlay(
+                Capsule()
+                    .stroke(.white.opacity(0.28), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.14), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("分享收获"))
     }
 
     private func careButton(_ icon: String, _ title: String, completed: Bool, action: @escaping () -> Void) -> some View {

@@ -820,7 +820,7 @@ struct OpeningChoiceScene: View {
             warmOrb
 
             VStack(spacing: 18) {
-                Spacer()
+                Spacer(minLength: 20)
                 DeliveryChoiceSeed()
                     .scaleEffect(1.0 + 0.04 * warmGlow)
 
@@ -840,11 +840,11 @@ struct OpeningChoiceScene: View {
                         .padding(.top, 6)
                 }
 
-                Spacer()
                 footerText
-                    .padding(.bottom, 18)
+                    .padding(.bottom, 34)
             }
             .padding(.horizontal, 18)
+            .padding(.top, 38)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
@@ -892,6 +892,7 @@ struct OpeningChoiceScene: View {
             .font(.system(size: 16, weight: .medium, design: .rounded))
             .multilineTextAlignment(.center)
             .foregroundStyle(.white.opacity(0.82))
+            .padding(.top, 6)
     }
 
     private func choiceButton(title: String, isPrimary: Bool, action: @escaping () -> Void) -> some View {

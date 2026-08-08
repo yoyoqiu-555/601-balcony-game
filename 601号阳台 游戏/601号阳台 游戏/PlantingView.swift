@@ -112,12 +112,12 @@ struct PlantingView: View {
     }
 
     private func plantArea(size: CGSize) -> some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             Image(currentImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: size.width * 0.66, maxHeight: size.height * 0.84)
-                .scaleEffect(plantState == .recovering ? 0.96 : 1)
+                .frame(maxWidth: size.width * 0.54, maxHeight: size.height * 0.72)
+                .scaleEffect(plantState == .recovering ? 0.92 : 1)
                 .opacity(plantState == .recovering ? 0.72 : 1)
                 .animation(.spring(response: 0.5, dampingFraction: 0.75), value: plantState == .recovering)
                 .animation(.easeInOut(duration: 1), value: isHealthy)
@@ -148,7 +148,9 @@ struct PlantingView: View {
             }
 
             tomatoShareButton
-                .offset(x: 112, y: 108)
+                .padding(.trailing, 16)
+                .padding(.bottom, 18)
+                .zIndex(2)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -184,28 +186,25 @@ struct PlantingView: View {
         Button {
             showHarvestShare = true
         } label: {
-            HStack(spacing: 8) {
-                Text("🍅")
-                    .font(.title3)
-                Text("分享收获")
-                    .font(.subheadline.weight(.semibold))
-            }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(
-                LinearGradient(
-                    colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: Capsule()
-            )
-            .overlay(
-                Capsule()
-                    .stroke(.white.opacity(0.28), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.14), radius: 8, x: 0, y: 4)
+            Text("🍅")
+                .font(.system(size: 24, weight: .bold))
+                .frame(width: 48, height: 48)
+                .foregroundStyle(.white)
+                .background(
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                )
+                .overlay(
+                    Circle()
+                        .stroke(.white.opacity(0.34), lineWidth: 1.2)
+                )
+                .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("分享收获"))

@@ -5,8 +5,7 @@ import SwiftUI
 enum OpeningScene: Int, CaseIterable {
     case city
     case building
-    case elevatorHall
-    case elevatorRide
+    case elevatorTransition
     case room
     case deliveryWindow
     case choice
@@ -60,8 +59,7 @@ final class OpeningSceneManager: ObservableObject {
         let duration: Double = switch scene {
         case .city: 6.0
         case .building: 4.0
-        case .elevatorHall: 6.0
-        case .elevatorRide: 6.0
+        case .elevatorTransition: 3.0
         case .room: 6.0
         case .deliveryWindow: 7.0
         case .choice: 5.0
@@ -73,8 +71,7 @@ final class OpeningSceneManager: ObservableObject {
         let timings: [(OpeningScene, UInt64)] = [
             (.city, 6_000_000_000),
             (.building, 4_000_000_000),
-            (.elevatorHall, 6_000_000_000),
-            (.elevatorRide, 6_000_000_000),
+            (.elevatorTransition, 3_000_000_000),
             (.room, 6_000_000_000),
             (.deliveryWindow, 7_000_000_000),
             (.choice, 5_000_000_000)
@@ -129,10 +126,8 @@ struct OpeningRootView: View {
                 OpeningCityScene(progress: manager.progressRatio())
             case .building:
                 OpeningBuildingScene(progress: manager.progressRatio())
-            case .elevatorHall:
-                OpeningElevatorHallScene(progress: manager.progressRatio())
-            case .elevatorRide:
-                OpeningElevatorRideScene(progress: manager.progressRatio())
+            case .elevatorTransition:
+                OpeningElevatorTransitionScene(progress: manager.progressRatio())
             case .room:
                 OpeningRoomScene(progress: manager.progressRatio())
             case .deliveryWindow:
@@ -433,107 +428,76 @@ struct OpeningBuildingScene: View {
 
 // MARK: - Scene 3
 
-struct OpeningElevatorHallScene: View {
+struct OpeningElevatorTransitionScene: View {
     let progress: Double
+
+    private var doorOpenProgress: Double {
+        min(max(progress / 0.72, 0), 1)
+    }
+
+    private var fadeToRoomProgress: Double {
+        if progress <= 0.7 { return 0 }
+        return min((progress - 0.7) / 0.3, 1)
+    }
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.84, green: 0.88, blue: 0.92), Color(red: 0.70, green: 0.77, blue: 0.83)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            Image("ElevatorClose")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
 
-            VStack {
-                Spacer()
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(Color.white.opacity(0.22))
-                    .frame(width: 300, height: 450)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 26, style: .continuous)
-                            .stroke(Color.white.opacity(0.32), lineWidth: 2)
-                    )
-                    .overlay(
-                        VStack(spacing: 12) {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.cyan.opacity(0.8))
-                                .frame(width: 220, height: 8)
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                Text("12")
-                                    .font(.system(size: 48, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(Color.blue.opacity(0.72))
-                                Spacer()
-                            }
-                            Spacer()
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.cyan.opacity(0.8))
-                                .frame(width: 180, height: 8)
-                        }
-                        .padding(.vertical, 28)
-                    )
-                    .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: 8)
-                Spacer()
-            }
-            .padding(.top, 40)
+            Image("ElevatorOpen")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .opacity(doorOpenProgress)
 
-            HStack {
-                Spacer()
-                ElevatorDoorMock(progress: progress)
-                Spacer()
-            }
-            .padding(.top, 50)
+            ElevatorDoorCurtains(progress: doorOpenProgress)
+                .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 12) {
-                Spacer()
-                Text("欢迎回家。")
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.9))
-                Text("祝您拥有舒适的一天。")
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.8))
-            }
-            .padding(.bottom, 26)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            roomPreview
+                .opacity(fadeToRoomProgress)
         }
+    }
+
+    private var roomPreview: some View {
+        Image("ApartmentRoom")
+            .resizable()
+            .scaledToFill()
+            .ignoresSafeArea()
+            .overlay(Color.white.opacity(0.10))
+            .scaleEffect(1.01)
     }
 }
 
-struct ElevatorDoorMock: View {
+struct ElevatorDoorCurtains: View {
     let progress: Double
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.white.opacity(0.34))
-                .frame(width: 250, height: 380)
-                .overlay(
-                    HStack(spacing: 0) {
-                        Rectangle().fill(Color.clear).frame(width: 120)
-                        Rectangle()
-                            .fill(Color.cyan.opacity(0.18))
-                            .frame(width: 4)
-                            .offset(y: 8)
-                        Rectangle().fill(Color.clear).frame(width: 120)
-                    }
-                )
-                .overlay(
-                    HStack(spacing: 0) {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.16))
-                            .frame(width: 124)
-                            .offset(x: -min(progress, 1) * 62)
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.16))
-                            .frame(width: 124)
-                            .offset(x: min(progress, 1) * 62)
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                )
+        GeometryReader { proxy in
+            let doorWidth = proxy.size.width * 0.22
+            let offset = proxy.size.width * 0.12 * progress
+
+            HStack(spacing: 0) {
+                Rectangle()
+                    .fill(Color.black.opacity(0.36))
+                    .frame(width: doorWidth)
+                    .offset(x: -offset)
+                Spacer(minLength: 0)
+                Rectangle()
+                    .fill(Color.black.opacity(0.36))
+                    .frame(width: doorWidth)
+                    .offset(x: offset)
+            }
+            .overlay(
+                Rectangle()
+                    .fill(Color.cyan.opacity(0.12 + progress * 0.12))
+                    .frame(height: 2)
+                    .offset(y: -proxy.size.height * 0.08)
+                    .opacity(0.8)
+            )
         }
-        .opacity(0.75)
     }
 }
 
@@ -819,10 +783,11 @@ struct OpeningChoiceScene: View {
             choiceBackground
             warmOrb
 
-            VStack(spacing: 18) {
-                Spacer(minLength: 20)
+            VStack(spacing: 14) {
+                Spacer(minLength: 10)
                 DeliveryChoiceSeed()
-                    .scaleEffect(1.0 + 0.04 * warmGlow)
+                    .scaleEffect(0.86 + 0.04 * warmGlow)
+                    .padding(.top, 6)
 
                 OpeningTextBlock(
                     lines: ["请确认您的选择。"],
@@ -832,19 +797,20 @@ struct OpeningChoiceScene: View {
                 .opacity(progress > 0.18 ? 1 : 0)
 
                 choiceButtons
-                    .padding(.top, 4)
+                    .padding(.top, 2)
                     .opacity(selection == nil ? 1 : 0.65)
 
                 if let selection {
                     selectionText(selection)
-                        .padding(.top, 6)
+                        .padding(.top, 2)
                 }
 
                 footerText
-                    .padding(.bottom, 34)
+                    .padding(.top, 2)
+                    .padding(.bottom, 18)
             }
             .padding(.horizontal, 18)
-            .padding(.top, 38)
+            .padding(.top, 12)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
@@ -889,10 +855,11 @@ struct OpeningChoiceScene: View {
 
     private var footerText: some View {
         Text("当所有生命都被系统管理。\n是否还有一颗种子，等待重新生长？")
-            .font(.system(size: 16, weight: .medium, design: .rounded))
+            .font(.system(size: 15, weight: .medium, design: .rounded))
             .multilineTextAlignment(.center)
             .foregroundStyle(.white.opacity(0.82))
-            .padding(.top, 6)
+            .lineLimit(2)
+            .minimumScaleFactor(0.85)
     }
 
     private func choiceButton(title: String, isPrimary: Bool, action: @escaping () -> Void) -> some View {

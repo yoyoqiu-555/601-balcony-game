@@ -816,23 +816,14 @@ struct OpeningChoiceScene: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.08, green: 0.12, blue: 0.18), Color(red: 0.18, green: 0.15, blue: 0.13)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-
-            Circle()
-                .fill(Color.orange.opacity(0.18 * warmGlow))
-                .blur(radius: 40)
-                .frame(width: 340, height: 340)
-                .position(x: UIScreen.main.bounds.width * 0.5, y: UIScreen.main.bounds.height * 0.46)
+            choiceBackground
+            warmOrb
 
             VStack(spacing: 18) {
                 Spacer()
                 DeliveryChoiceSeed()
                     .scaleEffect(1.0 + 0.04 * warmGlow)
+
                 OpeningTextBlock(
                     lines: ["请确认您的选择。"],
                     alignment: .center,
@@ -840,29 +831,17 @@ struct OpeningChoiceScene: View {
                 )
                 .opacity(progress > 0.18 ? 1 : 0)
 
-                HStack(spacing: 14) {
-                    choiceButton(title: "销毁样本", isPrimary: false) {
-                        onChoose(.destroy)
-                    }
-                    choiceButton(title: "保留样本", isPrimary: true) {
-                        onChoose(.keep)
-                    }
-                }
-                .padding(.top, 4)
-                .opacity(selection == nil ? 1 : 0.65)
+                choiceButtons
+                    .padding(.top, 4)
+                    .opacity(selection == nil ? 1 : 0.65)
 
                 if let selection {
-                    Text(selection == .keep ? "已选择：保留样本" : "已选择：销毁样本")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.9))
+                    selectionText(selection)
                         .padding(.top, 6)
                 }
 
                 Spacer()
-                Text("当所有生命都被系统管理。\n是否还有一颗种子，等待重新生长？")
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.white.opacity(0.82))
+                footerText
                     .padding(.bottom, 18)
             }
             .padding(.horizontal, 18)
@@ -874,22 +853,61 @@ struct OpeningChoiceScene: View {
         }
     }
 
+    private var choiceBackground: some View {
+        LinearGradient(
+            colors: [Color(red: 0.08, green: 0.12, blue: 0.18), Color(red: 0.18, green: 0.15, blue: 0.13)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+    }
+
+    private var warmOrb: some View {
+        Circle()
+            .fill(Color.orange.opacity(0.18 * warmGlow))
+            .blur(radius: 40)
+            .frame(width: 340, height: 340)
+            .position(x: UIScreen.main.bounds.width * 0.5, y: UIScreen.main.bounds.height * 0.46)
+    }
+
+    private var choiceButtons: some View {
+        HStack(spacing: 14) {
+            choiceButton(title: "销毁样本", isPrimary: false) {
+                onChoose(.destroy)
+            }
+            choiceButton(title: "保留样本", isPrimary: true) {
+                onChoose(.keep)
+            }
+        }
+    }
+
+    private func selectionText(_ selection: OpeningSceneManager.ChoiceSelection) -> some View {
+        Text(selection == .keep ? "已选择：保留样本" : "已选择：销毁样本")
+            .font(.system(size: 15, weight: .semibold, design: .rounded))
+            .foregroundStyle(Color.white.opacity(0.9))
+    }
+
+    private var footerText: some View {
+        Text("当所有生命都被系统管理。\n是否还有一颗种子，等待重新生长？")
+            .font(.system(size: 16, weight: .medium, design: .rounded))
+            .multilineTextAlignment(.center)
+            .foregroundStyle(.white.opacity(0.82))
+    }
+
     private func choiceButton(title: String, isPrimary: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundStyle(isPrimary ? Color.black.opacity(0.8) : Color.white.opacity(0.88))
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(isPrimary ? Color.orange.opacity(0.92) : Color.white.opacity(0.14))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(isPrimary ? Color.orange.opacity(0.8) : Color.white.opacity(0.20), lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(0.18), radius: 8, y: 4)
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(isPrimary ? Color.orange.opacity(0.92) : Color.white.opacity(0.14))
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isPrimary ? Color.orange.opacity(0.8) : Color.white.opacity(0.20), lineWidth: 1)
+                Text(title)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(isPrimary ? Color.black.opacity(0.8) : Color.white.opacity(0.88))
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+            }
+            .shadow(color: .black.opacity(0.18), radius: 8, y: 4)
         }
         .buttonStyle(.plain)
         .scaleEffect(selection == nil ? 1 : 0.98)

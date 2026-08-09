@@ -66,6 +66,9 @@ struct PlantingView: View {
             .sheet(isPresented: $showHarvestShare) {
                 HarvestShareView()
             }
+            .onAppear {
+                showHarvestShare = true
+            }
             .ignoresSafeArea(size.width > size.height ? [] : [])
         }
     }

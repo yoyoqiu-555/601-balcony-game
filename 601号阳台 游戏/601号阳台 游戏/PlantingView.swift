@@ -43,8 +43,6 @@ struct PlantingView: View {
                     portraitLayout(size: size)
                 }
 
-                shareButtonOverlay
-
                 if showCompletion {
                     VStack {
                         Text("养护完成")
@@ -59,6 +57,11 @@ struct PlantingView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+            }
+            .overlay(alignment: .topTrailing) {
+                shareButtonFloating
+                    .padding(.top, 14)
+                    .padding(.trailing, 14)
             }
             .sheet(isPresented: $showHarvestShare) {
                 HarvestShareView()
@@ -214,34 +217,25 @@ struct PlantingView: View {
         .accessibilityLabel(Text("分享收获"))
     }
 
-    private var shareButtonOverlay: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                Button {
-                    showHarvestShare = true
-                } label: {
-                    HStack(spacing: 8) {
-                        Text("🍅")
-                        Text("分享")
-                    }
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color.red.opacity(0.95), in: Capsule())
-                    .overlay(Capsule().stroke(.white.opacity(0.32), lineWidth: 1))
-                    .shadow(color: .black.opacity(0.22), radius: 8, x: 0, y: 4)
-                }
-                .buttonStyle(.plain)
-                .padding(.trailing, 12)
-                .padding(.bottom, 12)
+    private var shareButtonFloating: some View {
+        Button {
+            showHarvestShare = true
+        } label: {
+            HStack(spacing: 8) {
+                Text("🍅")
+                Text("分享收获")
             }
+            .font(.headline)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.red.opacity(0.96), in: Capsule())
+            .overlay(Capsule().stroke(.white.opacity(0.34), lineWidth: 1))
+            .shadow(color: .black.opacity(0.24), radius: 10, x: 0, y: 5)
         }
-        .ignoresSafeArea()
-        .allowsHitTesting(true)
+        .buttonStyle(.plain)
         .zIndex(999)
+        .accessibilityLabel(Text("分享收获"))
     }
 
     private func careButton(_ icon: String, _ title: String, completed: Bool, action: @escaping () -> Void) -> some View {

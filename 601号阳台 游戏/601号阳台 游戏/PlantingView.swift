@@ -17,6 +17,8 @@ struct PlantingView: View {
     @State private var showScissors = false
     @State private var showCompletion = false
     @State private var showHarvestShare = false
+    @State private var scissorsPosition: CGPoint = .zero
+    @State private var isDraggingScissors = false
 
     private let witheredPlantImage = "半枯萎状态"
     private let healthyPlantImage = "阳台近景"
@@ -78,7 +80,7 @@ struct PlantingView: View {
             plantArea(size: size)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            toolbar
+            toolbar(size: size)
                 .frame(width: max(210, size.width * 0.28))
                 .padding(.vertical, 18)
                 .padding(.trailing, 14)
@@ -113,7 +115,7 @@ struct PlantingView: View {
             plantArea(size: size)
                 .frame(maxWidth: .infinity)
 
-            toolbar
+            toolbar(size: size)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
         }
@@ -125,7 +127,7 @@ struct PlantingView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: size.width * 0.32, maxHeight: size.height * 0.44)
-                .scaleEffect(plantState == .recovering ? 0.86 : 0.92)
+                .scaleEffect(plantState == .recovering ? 0.84 : 0.90)
                 .opacity(plantState == .recovering ? 0.72 : 1)
                 .animation(.spring(response: 0.5, dampingFraction: 0.75), value: plantState == .recovering)
                 .animation(.easeInOut(duration: 1), value: isHealthy)
@@ -142,10 +144,16 @@ struct PlantingView: View {
             }
 
             if showScissors {
-                Text("✂️")
-                    .font(.system(size: 42))
-                    .offset(x: 88, y: 16)
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                ScissorsDragView(
+                    imageName: "ScissorsOpen",
+                    isDragging: $isDraggingScissors,
+                    position: $scissorsPosition,
+                    plantCenterX: size.width * 0.36,
+                    plantCenterY: size.height * 0.46,
+                    onComplete: {
+                        completeTrimAction()
+                    }
+                )
             }
 
             if !hasRemovedBug {
@@ -158,7 +166,7 @@ struct PlantingView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private var toolbar: some View {
+    private func toolbar(size: CGSize) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("辅助工具栏")
                 .font(.headline)
@@ -167,7 +175,9 @@ struct PlantingView: View {
 
             careButton("🐛", "除虫", completed: hasRemovedBug) { removeBug() }
             careButton("💧", "浇水", completed: hasWatered) { waterPlant() }
-            careButton("✂️", "修剪枝叶", completed: hasTrimmed) { trimPlant() }
+            careButton("✂️", "修剪枝叶", completed: hasTrimmed) {
+                trimPlant(size: size)
+            }
 
             Spacer(minLength: 0)
 
@@ -274,18 +284,73 @@ struct PlantingView: View {
         }
     }
 
-    private func trimPlant() {
+    private func trimPlant(size: CGSize) {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
             showScissors = true
             plantState = .recovering
+            scissorsPosition = CGPoint(x: size.width * 0.72, y: size.height * 0.28)
+            isDraggingScissors = false
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
-            withAnimation {
-                hasTrimmed = true
-                showScissors = false
-            }
-            finishIfNeeded()
+    }
+
+    private func completeTrimAction() {
+        withAnimation {
+            hasTrimmed = true
+            showScissors = false
+            isDraggingScissors = false
         }
+        finishIfNeeded()
+    }
+}
+
+struct ScissorsDragView: View {
+    let imageName: String
+    @Binding var isDragging: Bool
+    @Binding var position: CGPoint
+    let plantCenterX: CGFloat
+    let plantCenterY: CGFloat
+    let onComplete: () -> Void
+
+    @GestureState private var dragOffset: CGSize = .zero
+    @State private var didComplete = false
+
+    private var currentPosition: CGPoint {
+        CGPoint(
+            x: position.x + dragOffset.width,
+            y: position.y + dragOffset.height
+        )
+    }
+
+    var body: some View {
+        Image(imageName)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 122, height: 122)
+            .position(currentPosition)
+            .scaleEffect(isDragging ? 1.04 : 1)
+            .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+            .highPriorityGesture(
+                DragGesture()
+                    .updating($dragOffset) { value, state, _ in
+                        state = value.translation
+                        isDragging = true
+                    }
+                    .onEnded { value in
+                        let newX = position.x + value.translation.width
+                        let newY = position.y + value.translation.height
+                        position = CGPoint(x: newX, y: newY)
+                        isDragging = false
+
+                        let dx = newX - plantCenterX
+                        let dy = newY - plantCenterY
+                        let distance = sqrt(dx * dx + dy * dy)
+                        if distance < 180, !didComplete {
+                            didComplete = true
+                            onComplete()
+                        }
+                    }
+            )
+            .animation(.spring(response: 0.28, dampingFraction: 0.76), value: isDragging)
     }
 }
 

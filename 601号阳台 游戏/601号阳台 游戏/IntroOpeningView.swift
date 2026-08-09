@@ -366,13 +366,6 @@ struct OpeningBuildingScene: View {
                 .ignoresSafeArea()
 
             if progress > 0.56 {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.cyan.opacity(0.95))
-                    .frame(width: 96, height: 36)
-                    .shadow(color: .cyan.opacity(0.8), radius: 12)
-                    .overlay(Text("601").font(.headline).foregroundStyle(.black.opacity(0.78)))
-                    .offset(x: 118, y: -28)
-                    .transition(.opacity)
             }
 
         }
@@ -398,12 +391,16 @@ struct OpeningElevatorTransitionScene: View {
             Image("ElevatorClose")
                 .resizable()
                 .scaledToFill()
+                .frame(width: UIScreen.main.bounds.width * 0.90, height: UIScreen.main.bounds.height * 0.84)
                 .ignoresSafeArea()
+                .scaleEffect(0.86 + progress * 0.04)
 
             Image("ElevatorOpen")
                 .resizable()
                 .scaledToFill()
+                .frame(width: UIScreen.main.bounds.width * 0.90, height: UIScreen.main.bounds.height * 0.84)
                 .ignoresSafeArea()
+                .scaleEffect(0.86 + progress * 0.04)
                 .opacity(doorOpenProgress)
 
             ElevatorDoorCurtains(progress: doorOpenProgress)
@@ -418,10 +415,10 @@ struct OpeningElevatorTransitionScene: View {
         Image("ApartmentRoom")
             .resizable()
             .scaledToFill()
-            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.92)
+            .frame(width: UIScreen.main.bounds.width * 0.92, height: UIScreen.main.bounds.height * 0.84)
             .ignoresSafeArea()
             .overlay(Color.white.opacity(0.10))
-            .scaleEffect(0.95)
+            .scaleEffect(0.90)
     }
 }
 

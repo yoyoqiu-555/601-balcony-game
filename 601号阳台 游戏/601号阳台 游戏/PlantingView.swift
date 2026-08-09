@@ -58,10 +58,10 @@ struct PlantingView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .overlay(alignment: .topTrailing) {
-                shareButtonFloating
+            .overlay(alignment: .topLeading) {
+                topLeftControls
                     .padding(.top, 14)
-                    .padding(.trailing, 14)
+                    .padding(.leading, 14)
             }
             .sheet(isPresented: $showHarvestShare) {
                 HarvestShareView()
@@ -166,8 +166,6 @@ struct PlantingView: View {
             careButton("💧", "浇水", completed: hasWatered) { waterPlant() }
             careButton("✂️", "修剪枝叶", completed: hasTrimmed) { trimPlant() }
 
-            shareButtonInToolbar
-
             Spacer(minLength: 0)
 
             Text(isHealthy ? "植物已经恢复健康" : "完成三项养护，让植物恢复生机")
@@ -184,59 +182,38 @@ struct PlantingView: View {
         )
     }
 
-    private var shareButtonInToolbar: some View {
-        Button {
-            showHarvestShare = true
-        } label: {
-            HStack(spacing: 12) {
-                Text("🍅").font(.title3)
-                Text("分享收获")
-                    .font(.headline)
-                Spacer()
-                Image(systemName: "chevron.right")
+    private var topLeftControls: some View {
+        HStack(spacing: 10) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.black.opacity(0.7))
+                    .padding(12)
+                    .background(.white.opacity(0.55), in: Capsule())
             }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 16)
-            .frame(height: 54)
-            .frame(maxWidth: .infinity)
-            .background(
-                LinearGradient(
-                    colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(.white.opacity(0.34), lineWidth: 1.2)
-            )
-            .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
+            .buttonStyle(.plain)
+
+            Button {
+                showHarvestShare = true
+            } label: {
+                HStack(spacing: 8) {
+                    Text("🍅")
+                    Text("分享收获")
+                        .font(.headline)
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color.red.opacity(0.95), in: Capsule())
+                .overlay(Capsule().stroke(.white.opacity(0.34), lineWidth: 1))
+                .shadow(color: .black.opacity(0.24), radius: 10, x: 0, y: 5)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text("分享收获"))
     }
 
-    private var shareButtonFloating: some View {
-        Button {
-            showHarvestShare = true
-        } label: {
-            HStack(spacing: 8) {
-                Text("🍅")
-                Text("分享收获")
-            }
-            .font(.headline)
-            .foregroundStyle(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(Color.red.opacity(0.96), in: Capsule())
-            .overlay(Capsule().stroke(.white.opacity(0.34), lineWidth: 1))
-            .shadow(color: .black.opacity(0.24), radius: 10, x: 0, y: 5)
-        }
-        .buttonStyle(.plain)
-        .zIndex(999)
-        .accessibilityLabel(Text("分享收获"))
-    }
 
     private func careButton(_ icon: String, _ title: String, completed: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {

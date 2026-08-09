@@ -9,23 +9,41 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var showHideGame = false
+    @State private var showPlantingView = false
 
     var body: some View {
         BalconySceneView()
             .overlay(alignment: .topLeading) {
-                Button {
-                    showHideGame = true
-                } label: {
-                    Label("躲藏", systemImage: "eye.slash.fill")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(.black.opacity(0.28), in: Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(.white.opacity(0.22), lineWidth: 1)
-                        )
+                VStack(alignment: .leading, spacing: 10) {
+                    Button {
+                        showHideGame = true
+                    } label: {
+                        Label("躲藏", systemImage: "eye.slash.fill")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
+                            .background(.black.opacity(0.28), in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(.white.opacity(0.22), lineWidth: 1)
+                            )
+                    }
+
+                    Button {
+                        showPlantingView = true
+                    } label: {
+                        Label("植物养护", systemImage: "leaf.fill")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
+                            .background(Color.green.opacity(0.55), in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(.white.opacity(0.24), lineWidth: 1)
+                            )
+                    }
                 }
                 .padding(.top, 18)
                 .padding(.leading, 16)
@@ -44,6 +62,9 @@ struct ContentView: View {
                         }
                         .accessibilityLabel(Text("关闭"))
                     }
+            }
+            .fullScreenCover(isPresented: $showPlantingView) {
+                PlantingView()
             }
     }
 }

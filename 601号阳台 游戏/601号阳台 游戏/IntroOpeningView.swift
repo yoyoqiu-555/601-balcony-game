@@ -233,8 +233,8 @@ struct OpeningCityScene: View {
             Image("BalconyCity")
                 .resizable()
                 .scaledToFill()
-                .frame(width: UIScreen.main.bounds.width * 1.08, height: UIScreen.main.bounds.height * 0.96)
-                .scaleEffect(0.98 + progress * 0.04)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.90)
+                .scaleEffect(0.94 + progress * 0.03)
                 .offset(y: -progress * 10)
                 .overlay(
                     Rectangle()
@@ -324,8 +324,8 @@ struct OpeningBuildingScene: View {
             Image("BalconyCity")
                 .resizable()
                 .scaledToFill()
-                .frame(width: UIScreen.main.bounds.width * 1.08, height: UIScreen.main.bounds.height * 0.96)
-                .scaleEffect(0.96 + progress * 0.03)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.90)
+                .scaleEffect(0.92 + progress * 0.02)
                 .blur(radius: 1.0)
                 .opacity(0.9)
                 .ignoresSafeArea()
@@ -418,9 +418,10 @@ struct OpeningElevatorTransitionScene: View {
         Image("ApartmentRoom")
             .resizable()
             .scaledToFill()
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height * 0.92)
             .ignoresSafeArea()
             .overlay(Color.white.opacity(0.10))
-            .scaleEffect(1.01)
+            .scaleEffect(0.95)
     }
 }
 

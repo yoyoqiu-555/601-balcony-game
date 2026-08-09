@@ -118,8 +118,8 @@ struct PlantingView: View {
             Image(currentImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: size.width * 0.38, maxHeight: size.height * 0.52)
-                .scaleEffect(plantState == .recovering ? 0.90 : 0.96)
+                .frame(maxWidth: size.width * 0.32, maxHeight: size.height * 0.44)
+                .scaleEffect(plantState == .recovering ? 0.86 : 0.92)
                 .opacity(plantState == .recovering ? 0.72 : 1)
                 .animation(.spring(response: 0.5, dampingFraction: 0.75), value: plantState == .recovering)
                 .animation(.easeInOut(duration: 1), value: isHealthy)
@@ -222,21 +222,26 @@ struct PlantingView: View {
                 Button {
                     showHarvestShare = true
                 } label: {
-                    Text("🍅 分享")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(Color.red.opacity(0.92), in: Capsule())
-                        .overlay(Capsule().stroke(.white.opacity(0.28), lineWidth: 1))
-                        .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+                    HStack(spacing: 8) {
+                        Text("🍅")
+                        Text("分享")
+                    }
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(Color.red.opacity(0.95), in: Capsule())
+                    .overlay(Capsule().stroke(.white.opacity(0.32), lineWidth: 1))
+                    .shadow(color: .black.opacity(0.22), radius: 8, x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, 18)
-                .padding(.bottom, 16)
+                .padding(.trailing, 12)
+                .padding(.bottom, 12)
             }
         }
+        .ignoresSafeArea()
         .allowsHitTesting(true)
+        .zIndex(999)
     }
 
     private func careButton(_ icon: String, _ title: String, completed: Bool, action: @escaping () -> Void) -> some View {

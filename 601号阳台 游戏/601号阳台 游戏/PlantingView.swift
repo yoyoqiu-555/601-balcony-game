@@ -43,6 +43,8 @@ struct PlantingView: View {
                     portraitLayout(size: size)
                 }
 
+                shareButtonOverlay
+
                 if showCompletion {
                     VStack {
                         Text("养护完成")
@@ -116,8 +118,8 @@ struct PlantingView: View {
             Image(currentImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: size.width * 0.44, maxHeight: size.height * 0.60)
-                .scaleEffect(plantState == .recovering ? 0.92 : 1)
+                .frame(maxWidth: size.width * 0.38, maxHeight: size.height * 0.52)
+                .scaleEffect(plantState == .recovering ? 0.90 : 0.96)
                 .opacity(plantState == .recovering ? 0.72 : 1)
                 .animation(.spring(response: 0.5, dampingFraction: 0.75), value: plantState == .recovering)
                 .animation(.easeInOut(duration: 1), value: isHealthy)
@@ -160,7 +162,8 @@ struct PlantingView: View {
             careButton("🐛", "除虫", completed: hasRemovedBug) { removeBug() }
             careButton("💧", "浇水", completed: hasWatered) { waterPlant() }
             careButton("✂️", "修剪枝叶", completed: hasTrimmed) { trimPlant() }
-            careButton("🍅", "分享收获", completed: false) { showHarvestShare = true }
+
+            shareButtonInToolbar
 
             Spacer(minLength: 0)
 
@@ -178,35 +181,62 @@ struct PlantingView: View {
         )
     }
 
-    private var tomatoShareButton: some View {
+    private var shareButtonInToolbar: some View {
         Button {
             showHarvestShare = true
         } label: {
-            HStack(spacing: 10) {
-                Text("🍅")
-                    .font(.title3)
+            HStack(spacing: 12) {
+                Text("🍅").font(.title3)
                 Text("分享收获")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.headline)
+                Spacer()
+                Image(systemName: "chevron.right")
             }
             .foregroundStyle(.white)
-            .padding(.horizontal, 14)
-            .frame(height: 44)
+            .padding(.horizontal, 16)
+            .frame(height: 54)
+            .frame(maxWidth: .infinity)
             .background(
                 LinearGradient(
                     colors: [Color.red.opacity(0.95), Color.orange.opacity(0.92)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ),
-                in: Capsule()
+                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
             )
             .overlay(
-                Capsule()
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(.white.opacity(0.34), lineWidth: 1.2)
             )
             .shadow(color: .black.opacity(0.16), radius: 6, x: 0, y: 3)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text("分享收获"))
+    }
+
+    private var shareButtonOverlay: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button {
+                    showHarvestShare = true
+                } label: {
+                    Text("🍅 分享")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(Color.red.opacity(0.92), in: Capsule())
+                        .overlay(Capsule().stroke(.white.opacity(0.28), lineWidth: 1))
+                        .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 18)
+                .padding(.bottom, 16)
+            }
+        }
+        .allowsHitTesting(true)
     }
 
     private func careButton(_ icon: String, _ title: String, completed: Bool, action: @escaping () -> Void) -> some View {
